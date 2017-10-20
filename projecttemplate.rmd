@@ -1,4 +1,4 @@
-TITLE by YOUR_NAME_HERE
+Exploring Red wine data by Nika Dogonadze
 ========================================================
 
 > **Tip**: You will see quoted sections like this throughout the template to
@@ -29,11 +29,14 @@ library(ggplot2)
 ```{r echo=FALSE, Load_the_Data}
 # Load the Data
 
+wqr = read.csv('wineQualityReds.csv') 
 ```
 
 > **Tip**: Before you create any plots, it is a good idea to provide a short
 introduction into the dataset that you are planning to explore. Replace this
 quoted text with that general information!
+
+This report explors dataset about red wine quality, which can be found [here](https://www.google.com/url?q=https://s3.amazonaws.com/udacity-hosted-downloads/ud651/wineQualityReds.csv&sa=D&ust=1508499119744000&usg=AFQjCNE00TiuImFciSXwq5rY9JARtyxktA)
 
 # Univariate Plots Section
 
@@ -45,8 +48,47 @@ There should be multiple code chunks and text sections; the first one below is
 just to help you get started.
 
 ```{r echo=FALSE, Univariate_Plots}
+dim(wqr)
 
+str(wqr)
+
+summary(wqr)
 ```
+
+This particular dataset contains 13 variables and just under 1,600 observations
+
+```{r}
+qplot(x = quality, data = wqr, binwidth=1)
+```
+
+The quality of wine ranges from 3 to 8 and seems to have a normal distribution. Most of wines have quality rating of 5 or 6.
+Now, Lets look at distribution of other variables
+
+```{r}
+qplot(x = fixed.acidity, data = wqr, binwidth=0.5)
+
+qplot(x = volatile.acidity, data = wqr)
+
+qplot(x = citric.acid, data = wqr)
+
+qplot(x = residual.sugar, data = wqr, binwidth=0.5)
+
+qplot(x = chlorides, data = wqr, binwidth=0.01)
+
+qplot(x = free.sulfur.dioxide, data = wqr, binwidth=2)
+
+qplot(x = total.sulfur.dioxide, data = wqr, binwidth=0.1) + 
+  scale_x_log10()
+
+qplot(x = density, data = wqr)
+
+qplot(x = pH, data = wqr, binwidth=0.05)
+
+qplot(x = sulphates, data = wqr)
+
+qplot(x = alcohol, data = wqr, binwidth=0.05)
+```
+
 
 > **Tip**: Make sure that you leave a blank line between the start / end of
 each code block and the end / start of your Markdown text so that it is
