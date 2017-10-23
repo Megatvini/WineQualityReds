@@ -45,14 +45,14 @@ qplot(x = quality, data = wqr, binwidth=1)
 The quality of wine ranges from 3 to 8 and seems to have a normal distribution. Most of wines have quality rating of 5 or 6.
 Now, Lets look at distribution of other variables
 
-```{r}
+```{r echo=FALSE}
 qplot(x = fixed.acidity, data = wqr, binwidth=0.5)
 ```
 
 This parameter shows how much [tartaric acid](https://en.wikipedia.org/wiki/Tartaric_acid) wine contains, given in grams per litre. As can be seen on the graph it has normal distribution which is slightly skewed to the right. Most wines have fixed acidity arount 6-10 grams per litre.
 
 
-```{r}
+```{r echo=FALSE}
 
 qplot(x = volatile.acidity, data = wqr, binwidth=0.02)
 
@@ -61,34 +61,36 @@ qplot(x = volatile.acidity, data = wqr, binwidth=0.02)
 Volative acidity shows measurement of [acetic acid](https://en.wikipedia.org/wiki/Acetic_acid) in wine, which can be a cause of an unpleasant, vinegar taste. It is given in same units as fixed acidity. It look like bimodal distribution with some outliers having too large values.
 
 
-```{r}
+```{r echo=FALSE, warning=FALSE, message=FALSE}
 
-qplot(x = citric.acid, data = wqr, binwidth=0.03)
+qplot(x = citric.acid, data = wqr, binwidth=0.05)
 nrow(subset(wqr, citric.acid == 0))
 
 ```
 
 132 of wines have [citric acid](https://en.wikipedia.org/wiki/Citric_acid) measure of 0. The maximum is 1 grams per litre. 
 
-```{r}
+```{r echo=FALSE}
 
-qplot(x = residual.sugar, data = wqr, binwidth=0.2)
+qplot(x = residual.sugar, data = wqr, binwidth=0.1) + 
+  scale_x_log10(breaks=1:16)
 
 ```
 
 The measurment of sugar (g per litre) in wine is something I would expect to have a lot of influence on wine quality. However, I have read that wines are only considered sweet after having more than 45 grammes per litre of residual sugar. Maximum in this data is about 15g/litre with most having 4g/litre or less. 
 
 
-```{r}
+```{r echo=FALSE}
 
-qplot(x = chlorides, data = wqr, binwidth=0.01)
+qplot(x = chlorides, data = wqr, binwidth=0.05) + 
+  scale_x_log10(breaks = c(0.01, 0.02, 0.03, 0.04, 0.05, 0.1, 0.5))
 
 ```
 
-This parameter show amount of salt in g/litre. It's distirbution looks a lot like sugar distribution. I would imagine this also is important part of wine taste.
+This parameter show amount of salt in g/litre. After scaling x axis to logarithmic scale, it's distirbution looks a lot like normal distribution. I would imagine this also is important part of wine taste.
 
 
-```{r}
+```{r echo=FALSE}
 
   qplot(x = free.sulfur.dioxide, data = wqr, binwidth=2)
   qplot(x = total.sulfur.dioxide, data = wqr, binwidth=3)
@@ -96,20 +98,23 @@ This parameter show amount of salt in g/litre. It's distirbution looks a lot lik
 
 ```
 
-[sulfur dioxide](https://en.wikipedia.org/wiki/Sulfur_dioxide) can have an influence on microbial growth and win oxidation level. It is not easily detectable in wine taste, unless it is more than 50 parts per million. Sulphates can increase number of sulfur oxides. Sulfur dioxide levels look heavily skewed to the right, lets see them on logarithmic scale.
+[sulfur dioxide](https://en.wikipedia.org/wiki/Sulfur_dioxide) can have an influence on microbial growth and win oxidation level. It is not easily detectable in wine taste, unless it is more than 50 parts per million. Sulphates can increase number of sulfur oxides. Sulfur dioxide and suphate levels look heavily skewed to the right, lets see them on logarithmic scale.
 
-```{r}
+```{r echo=FALSE}
   qplot(x = free.sulfur.dioxide, data = wqr, binwidth=0.2) + 
-    scale_x_log10()
+    scale_x_log10(breaks=2**(0:6))
 
   qplot(x = total.sulfur.dioxide, data = wqr, binwidth=0.2) + 
-    scale_x_log10()
+    scale_x_log10(breaks=2**(0:8))
+  
+  qplot(x = sulphates, data = wqr, binwidth=0.03) + 
+    scale_x_log10(breaks=c(0.4, 0.5, 1, 2))
 ```
 
 After scaling values to log10 the distributions look normal. Conviniently, we did not have any zeros. 
 
 
-```{r}
+```{r echo=FALSE}
 qplot(x = density, data = wqr, binwidth=0.001)
 
 qplot(x = pH, data = wqr, binwidth=0.05)
@@ -162,7 +167,7 @@ subset(corr_table, abs(Freq) > 0.5 & Var1 != Var2)
 
 Unfortunately, there do not seem to be any strongly correlated values with the quality, But Lets look at all the combinations.
 
-```{r}
+```{r echo=FALSE}
 
 pairs.panels(subset(wqr, select = -c(X, sulphates, residual.sugar, chlorides)))
 
@@ -170,9 +175,9 @@ pairs.panels(subset(wqr, select = -c(X, sulphates, residual.sugar, chlorides)))
 
 The most correlated variable with quality seems to be the alcohol, and volatile acidity. However other variables are still worth exploring of course.
 
-```{r}
+```{r echo=FALSE}
   ggplot(aes(x = alcohol, y = quality), data = wqr) + 
-    geom_point()
+    geom_jitter(alpha=1/5)
 
   wqr %>%
     group_by(quality) %>%
@@ -182,11 +187,11 @@ The most correlated variable with quality seems to be the alcohol, and volatile 
               max_alcohol = max(alcohol))
 ```
 
-It can be seen from the graph, that higher quality wines generally have higher alcohol concetration. There are quite a few exceptions to this though.
+After adding some jitter to points to fix the overplotting issue, it can be seen from the graph, that higher quality wines generally have higher alcohol concetration. There are quite a few exceptions to this though.
 
-```{r}
+```{r echo=FALSE}
   ggplot(aes(x = volatile.acidity, y = quality), data = wqr) + 
-    geom_point()
+    geom_jitter(alpha = 1/10)
 
   wqr %>%
     group_by(quality) %>%
@@ -198,9 +203,9 @@ It can be seen from the graph, that higher quality wines generally have higher a
 
 Good quality wines have relatively low volatile acidity. The best ones have no more than 0.85 g/litre and the lowest quality wines having as much as 1.58 g/litre.
 
-```{r}
+```{r echo=FALSE}
   ggplot(aes(x = pH, y = quality), data = wqr) + 
-    geom_point()
+    geom_jitter(alpha=1/10)
 
   ggplot(aes(x = quality, group = quality, y = pH), data = wqr) + 
     geom_boxplot()
@@ -209,9 +214,9 @@ Good quality wines have relatively low volatile acidity. The best ones have no m
   Unlike the scatter plot, the boxplot graph shows that wines that are rated with lower quality have higher average pH value. It is showing some outliers too, mostly having quality 5 or 6 which is expected because most of quality values are in that range.
   
   
-```{r}
+```{r echo=FALSE}
   ggplot(aes(x = residual.sugar, y = quality), data = wqr) + 
-    geom_point()
+    geom_jitter(alpha = 1/20)
 
   wqr %>%
     group_by(quality) %>%
@@ -221,23 +226,24 @@ Good quality wines have relatively low volatile acidity. The best ones have no m
               max_alcohol = max(residual.sugar))
   
   ggplot(aes(x = quality, group = quality, y = residual.sugar), data = wqr) + 
-    geom_boxplot()
+    geom_boxplot() + 
+    coord_cartesian(ylim=c(1, 4))
 ```
 
 It is against my intuition that residual sugar content would not have an effect in wine quality. I suppose the possible reason could be that the variation between the sugar levels in this dataset is not noticeable enough for human taste to
 have an effect. Or maybe wine experts do not pay attention to sweetness when evaluating wines.
 
-```{r}
+```{r echo=FALSE}
   ggplot(aes(x = alcohol, y = density), data = wqr) + 
-    geom_point() + 
+    geom_point(alpha = 1/10) + 
     geom_smooth(method = 'lm')
 ```
 
 It is clear from the plot and the trendline that wines with higher alcohol levels have lower density. That is quite intuitive because of alcohol's low density.
 
-```{r}
+```{r echo=FALSE}
     ggplot(aes(x = free.sulfur.dioxide, y = total.sulfur.dioxide), data = wqr) + 
-    geom_point() + 
+    geom_point(alpha = 1/10) + 
     geom_smooth(method = 'lm')
 ```
 
@@ -269,20 +275,20 @@ The strongest relationship ovserved was between free sulfur dioxide and total su
 
 ```{r echo=FALSE, Multivariate_Plots}
   ggplot(aes(x = alcohol, y = quality, color = density), data = wqr) + 
-    geom_point()
+    geom_jitter()
 
   ggplot(aes(x = alcohol, y = quality, color = volatile.acidity), data = wqr) + 
-    geom_point()
+    geom_jitter()
 ```
 
 Higher rated wines have low volatile acidity and contain more alcohol. Almost all the wines that are rated 7 or higher
 have either low volatile acidity or high alcohol content.
 
-```{r}
+```{r echo=FALSE}
   wqr$alcohol_binned <- cut(wqr$alcohol, breaks=c(8, 10, 11, 12, 15)) 
 
   ggplot(aes(x = pH, y = quality), data = wqr) + 
-    geom_point() + 
+    geom_jitter(alpha = 1/10) + 
     facet_wrap(~alcohol_binned)
 ``` 
 
@@ -313,6 +319,7 @@ between 10%-12%.
 
 ggplot(aes(x = quality), data = wqr, binwidth = 1) +
   geom_bar(fill='blue') + 
+  ggtitle('Quality Score Distrobutoin of Red Wines') + 
   xlab('Quality score of red wine') + 
   ylab('Wines count') + 
   scale_x_continuous(breaks = 3:8)
@@ -329,9 +336,10 @@ the experts are not very generous with their score, top wines only getting score
 ```{r echo=FALSE, Plot_Two}
   ggplot(aes(x = alcohol, y = density), data = wqr) + 
     geom_point(alpha = 1/5, color = 'blue') + 
+    ggtitle('Density Versus Alhocol Percentage in Red Wines') + 
     geom_smooth(method = 'lm', color = 'black') + 
-    xlab('% of alcohol in wine') + 
-    ylab('Density of wine')
+    xlab('% of alcohol in wine (by volume)') + 
+    ylab('Density of wine (compared to water)')
 ```
 
 ### Description Two
@@ -343,9 +351,10 @@ It is always nice to be surpised by the data, but sometimes it is also pleasant 
 ### Plot Three
 ```{r echo=FALSE, Plot_Three}
   ggplot(aes(x = alcohol, y = quality, color = volatile.acidity), data = wqr) + 
-    geom_point() + 
+    geom_jitter() + 
+    ggtitle('Quality Score Versus Alcohol Percentage in Red Wines') + 
     ylab('Quality score of wine') + 
-    xlab('% of alcohol in wine')
+    xlab('% of alcohol in wine (by volume)')
 ```
 
 ### Description Three
