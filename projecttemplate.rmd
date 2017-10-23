@@ -1,4 +1,4 @@
-Exploring Red wine data by Nika Dogonadze
+Exploring red wine data by Nika Dogonadze
 ========================================================
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, packages}
@@ -38,7 +38,7 @@ summary(wqr)
 
 This particular dataset contains 13 variables and just under 1,600 observations. The real number of variables is 12, since x is just the row number. 
 
-```{r}
+```{r echo=FALSE}
 qplot(x = quality, data = wqr, binwidth=1)
 ```
 
@@ -307,14 +307,6 @@ between 10%-12%.
 ------
 
 # Final Plots and Summary
-
-> **Tip**: You've done a lot of exploration and have built up an understanding
-of the structure of and relationships between the variables in your dataset.
-Here, you will select three plots from all of your previous exploration to
-present here as a summary of some of your most interesting findings. Make sure
-that you have refined your selected plots for good titling, axis labels (with
-units), and good aesthetic choices (e.g. color, transparency). After each plot,
-make sure you justify why you chose each plot by describing what it shows.
 
 ### Plot One
 ```{r echo=FALSE, Plot_One}
