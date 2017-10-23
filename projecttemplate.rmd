@@ -164,7 +164,7 @@ Unfortunately, there do not seem to be any strongly correlated values with the q
 
 ```{r}
 
-pairs.panels(subset(wqr, select = -X))
+pairs.panels(subset(wqr, select = -c(X, sulphates, residual.sugar, chlorides)))
 
 ```
 
@@ -206,7 +206,7 @@ Good quality wines have relatively low volatile acidity. The best ones have no m
     geom_boxplot()
 ```
 
-  The boxplot graph shows that wines that are ratet with lower quality have higher average pH value. This effect is not evident on scatter plot. Let's look at the residual sugar content now
+  Unlike the scatter plot, the boxplot graph shows that wines that are rated with lower quality have higher average pH value. It is showing some outliers too, mostly having quality 5 or 6 which is expected because most of quality values are in that range.
   
   
 ```{r}
@@ -235,6 +235,12 @@ have an effect. Or maybe wine experts do not pay attention to sweetness when eva
 
 It is clear from the plot and the trendline that wines with higher alcohol levels have lower density. That is quite intuitive because of alcohol's low density.
 
+```{r}
+    ggplot(aes(x = free.sulfur.dioxide, y = total.sulfur.dioxide), data = wqr) + 
+    geom_point() + 
+    geom_smooth(method = 'lm')
+```
+
 
 # Bivariate Analysis
 
@@ -243,24 +249,45 @@ It is clear from the plot and the trendline that wines with higher alcohol level
 investigation. How did the feature(s) of interest vary with other features in \
 the dataset?
 
+The quality of the wine does not have a strong correlations with any of other variables. The most correlated
+variables to quality turned out to be alcohol and volatile.acidity. 
+It seems that better quality wines generally contain more alcohol and have less volatile acidity.
+
+
 ### Did you observe any interesting relationships between the other features \
 (not the main feature(s) of interest)?
 
+When making scatter plot of alcohol and density I observed that wines with higher alcohol content also have lower
+densities, however this relationship is not very strong and there quite a few outliers.
+
+
 ### What was the strongest relationship you found?
 
+The strongest relationship ovserved was between free sulfur dioxide and total sulfur dioxide. Which is not at all surprising as the latter contains the former.
 
 # Multivariate Plots Section
 
-> **Tip**: Now it's time to put everything together. Based on what you found in
-the bivariate plots section, create a few multivariate plots to investigate
-more complex interactions between variables. Make sure that the plots that you
-create here are justified by the plots you explored in the previous section. If
-you plan on creating any mathematical models, this is the section where you
-will do that.
-
 ```{r echo=FALSE, Multivariate_Plots}
+  ggplot(aes(x = alcohol, y = quality, color = density), data = wqr) + 
+    geom_point()
 
+  ggplot(aes(x = alcohol, y = quality, color = volatile.acidity), data = wqr) + 
+    geom_point()
 ```
+
+Higher rated wines have low volatile acidity and contain more alcohol. Almost all the wines that are rated 7 or higher
+have either low volatile acidity or high alcohol content.
+
+```{r}
+  wqr$alcohol_binned <- cut(wqr$alcohol, breaks=c(8, 10, 11, 12, 15)) 
+
+  ggplot(aes(x = pH, y = quality), data = wqr) + 
+    geom_point() + 
+    facet_wrap(~alcohol_binned)
+``` 
+
+For the alcohol levels between 10%-12% the lower pH level corresponds to higher wine quality assessment. However this does not hold true for wines containing less than 10% or more than 12% alcohol. 
+
 
 # Multivariate Analysis
 
@@ -268,10 +295,14 @@ will do that.
 investigation. Were there features that strengthened each other in terms of \
 looking at your feature(s) of interest?
 
+At first, despite having some correlation, neither alcohol nor volatile acidity were complete
+in accounting for the wine quality score. But when visualising all 3 variables in one plot,
+almost all the top rated wine turned out to have good measurement in at least one of those parameters.
+
 ### Were there any interesting or surprising interactions between features?
 
-### OPTIONAL: Did you create any models with your dataset? Discuss the \
-strengths and limitations of your model.
+I was very surprised to find that lower pH level indicates higher quality of wine only if the alcohol range is
+between 10%-12%.
 
 ------
 
@@ -288,34 +319,53 @@ make sure you justify why you chose each plot by describing what it shows.
 ### Plot One
 ```{r echo=FALSE, Plot_One}
 
+ggplot(aes(x = quality), data = wqr, binwidth = 1) +
+  geom_bar(fill='blue') + 
+  xlab('Quality score of red wine') + 
+  ylab('Wines count') + 
+  scale_x_continuous(breaks = 3:8)
+
 ```
 
 ### Description One
 
+This is the dsitribution of scores wine experts give to wines. The quality score culd from 0 to 10 inclusive, but
+the experts are not very generous with their score, top wines only getting score of 8.
+
 
 ### Plot Two
 ```{r echo=FALSE, Plot_Two}
-
+  ggplot(aes(x = alcohol, y = density), data = wqr) + 
+    geom_point(alpha = 1/5, color = 'blue') + 
+    geom_smooth(method = 'lm', color = 'black') + 
+    xlab('% of alcohol in wine') + 
+    ylab('Density of wine')
 ```
 
 ### Description Two
 
+It is always nice to be surpised by the data, but sometimes it is also pleasant and reassuring to see the expected trends. In this case we see that the more alcohol wine contains the less density it has, which is what one would expect considering the low denisty of the alcohol compared to water.
+
+
 
 ### Plot Three
 ```{r echo=FALSE, Plot_Three}
-
+  ggplot(aes(x = alcohol, y = quality, color = volatile.acidity), data = wqr) + 
+    geom_point() + 
+    ylab('Quality score of wine') + 
+    xlab('% of alcohol in wine')
 ```
 
 ### Description Three
+
+This graph shows alcohol percentage, volatile acidity in g/litre and quality score of wines. It illustrates that most of high-score wines are on the right side or have dark shade of blue which means high alcohol percentage or low volatile acidity respectively.
 
 ------
 
 # Reflection
 
-> **Tip**: Here's the final step! Reflect on the exploration you performed and
-the insights you found. What were some of the struggles that you went through?
-What went well? What was surprising? Make sure you include an insight into
-future work that could be done with the dataset.
+This dataset of red wines contains information about 1599 different wines tasted and evaluated by wine experts. I stated out by analysing variables individually and then in combinations. I discovered some relationships through visualizations and analysis.
 
-> **Tip**: Don't forget to remove this, and the other **Tip** sections before
-saving your final work and knitting the final report!
+It was very surprising for me that not a single variable had a strong correlation with the wine quality score. Relatively stronger correlations were alcohol percentage and volatile acidity. None of them seemed to be a good indicator of wine quality, but when plotting all those together made it clear that both are important factors for whether or not an expert will like the wine.
+
+The next very interesting step would be to build a model for quality score prediction. It's performance could be less than perfect because of some data limitations. The problem I see is that all the experts probably have a bias towards different tastes. Becaues of this, the generalisation of the wine quality score could be limited by their subjectivity. What I would improve in the data is to include identifiers for experts who rated the wine.
